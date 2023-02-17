@@ -1,36 +1,30 @@
 import './App.css';
-import { Layout, Space } from 'antd';
+import React, { Component } from "react";
+import { render } from "react-dom";
+import { Button, Layout, Space } from 'antd';
 const { Header, Footer, Sider, Content } = Layout;
 
-const headerStyle = {
-  textAlign: 'center',
-  color: '#fff',
-  height: 64,
-  paddingInline: 50,
-  lineHeight: '64px',
-  backgroundColor: '#7dbcea',
-};
-const contentStyle = {
-  textAlign: 'center',
-  minHeight: 120,
-  lineHeight: '120px',
-  color: '#fff',
-  backgroundColor: '#108ee9',
-};
-const siderStyle = {
-  textAlign: 'center',
-  lineHeight: '120px',
-  color: '#fff',
-  backgroundColor: '#3ba0e9',
-};
-const footerStyle = {
-  textAlign: 'center',
-  color: '#fff',
-  backgroundColor: '#7dbcea',
-};
+class App extends Component {
+  
+  constructor(props) {
+    super(props);
+    this.state = {
+      url: ""
+    };
+  }
 
-const App = () => (
-  <Space
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(position => {
+      this.setState({
+        url: "https://www.google.com.br/maps/search/" + position.coords.latitude + " " + position.coords.longitude
+      });
+    });
+    
+  }
+
+  render() {
+    return (
+      <Space
     direction="vertical"
     style={{
       width: '100%',
@@ -39,13 +33,29 @@ const App = () => (
     size={[0, 48]}
   >
     <Layout>
-      <Header style={headerStyle}>Elizandro José Schramm</Header>
+      <Header style={{textAlign: 'center',
+                     color: '#fff',
+                     height: 64,
+                     paddingInline: 50,
+                     lineHeight: '64px',
+                     backgroundColor: '#7dbcea'}}>
+          Elizandro José Schramm</Header>
       <Layout>
         {/* <Sider style={siderStyle}>Sider</Sider> */}
-        {/* <Content style={contentStyle}>Content</Content> */}
+        <Content style={{textAlign: 'center',
+                     color: '#fff',
+                     height: 64,
+                     paddingInline: 50,
+                     lineHeight: '64px',
+                     backgroundColor: '#7dbcea'}}>
+          <Button href={this.state.url} target="_blank" loading={!this.state.url}>Sua localização</Button>
+          </Content>
       </Layout>
       {/* <Footer style={footerStyle}>Footer</Footer> */}
     </Layout>
   </Space>
-);
+    );
+  }
+}
+
 export default App;
