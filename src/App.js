@@ -16,7 +16,7 @@ class App extends Component {
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(position => {
       this.setState({
-        url: "https://www.google.com.br/maps/search/" + position.coords.latitude + " " + position.coords.longitude
+        url: "https://www.google.com.br/maps/search/" + position.coords.latitude + "," + position.coords.longitude
       });
     });
     
