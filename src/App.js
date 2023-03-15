@@ -48,7 +48,23 @@ class App extends Component {
                      paddingInline: 50,
                      lineHeight: '64px',
                      backgroundColor: '#7dbcea'}}>
-          <Button href={this.state.url} target="_blank" loading={!this.state.url}>Sua localização</Button>
+            <Button href={this.state.url} target="_blank" loading={!this.state.url}>Sua localização</Button>
+          </Content>
+          <Content style={{textAlign: 'center',
+                     color: '#fff',
+                     height: 64,
+                     paddingInline: 50,
+                     lineHeight: '64px',
+                     backgroundColor: '#7dbcea'}}>
+            <Button href={"/sign.html"}>Widget Embedded</Button>
+          </Content>
+          <Content style={{textAlign: 'center',
+                     color: '#fff',
+                     height: 64,
+                     paddingInline: 50,
+                     lineHeight: '64px',
+                     backgroundColor: '#7dbcea'}}>
+            <Button href={"/sign_tokenless.html"} loading={true}>Widget Embedded Tokenless</Button>
           </Content>
       </Layout>
       {/* <Footer style={footerStyle}>Footer</Footer> */}
