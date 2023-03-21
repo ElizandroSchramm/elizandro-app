@@ -64,7 +64,7 @@ class App extends Component {
                      paddingInline: 50,
                      lineHeight: '64px',
                      backgroundColor: '#7dbcea'}}>
-            <Button href={"/sign_tokenless.html"} loading={true}>Widget Embedded Tokenless</Button>
+            <Button href={"/tokenless.html"}>Widget Embedded Tokenless</Button>
           </Content>
       </Layout>
       {/* <Footer style={footerStyle}>Footer</Footer> */}

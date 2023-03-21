@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created by Elizandro José Schramm"
+    />
+    <link href="styles/style.css" rel="stylesheet"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@200;400;600&display=swap" rel="stylesheet">
+    <title>Elizandro José Schramm</title>
+  </head>
+  <section id="main">
+    <h1>
+      Tudo pronto! <br>
+      Só falta assinar o contrato
+    </h1>
+    <div id='setDiv'>
+      <label>Request Signature Key</label><br>
+      <input type="text" id="key" name="key" required="true" />
+      <input id="setButton" type="submit" class="submitSignature" value="Carregar Widget" onclick="setWidget()" />
+    </div>
+    <br>
+    <form id="form" action="success.html" onsubmit="return false">
+      <label>CPF</label><br>
+      <input type="text" id="cpf" name="cpf" />
+      <br>
+
+      <label>Data de nascimento</label><br>
+      <input type="date" id="birthdate" name="birthdate" />
+      <br>
+
+      <div id="cs-tokenless-widget"></div>
+      <br>
+
+      <input disabled='disabled' id="submitButton" type="submit" class="submitSignature" value="Clique para assinar" />
+    </form>
+  </section>
+  <script>
+    function tokenlessWidget(uuid) {
+      const origin = window.location.hostname
+      const baseUrl = `https://app.clicksign.com/api/v2/widget/${uuid}`
+
+      let loader = 'Carregando Widget...'
+      let mounted = false
+      let wrapper = null
+      let signed = false
+
+      this.mount = ({containerId, textTemplate = 1}) => {
+        wrapper = document.getElementById(containerId)
+
+        if (wrapper === null) {
+          mounted = false
+          throw "It's not possible to render widget. 😵"
+        }
+
+        wrapper.innerHTML = loader
+        getContent(wrapper, textTemplate)
+        mounted = true
+      }
+
+      this.attach = (event, elID, method) => {
+        const el = document.getElementById(elID)
+        el.addEventListener(event, method)
+      }
+
+      this.sign = (info) => {
+        if (!mounted) { throw 'Widget not mounted. 😵' }
+        if (!signed) { throw "Can't sign without accept documents. 🤷🏻‍♂️" }
+
+        const prom_data = fetch(`${baseUrl}/sign`, {
+          method: 'POST',
+          body: JSON.stringify(info),
+          headers: {
+              Origin: origin
+            }
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            switch (data.status) {
+              case 'ok': return
+              case 'error': throw data.error
+              default: console.log("This shouldn't happend 🤭")
+            }
+          }
+        )
+        return prom_data
+      }
+
+      this.injectLoader = (el) => {
+        loader = el
+      }
+
+      function addCheckboxEventListener() {
+        const checkbox = document.getElementById('cs-checkbox-sign')
+        checkbox.addEventListener('change', () => {
+          signed = !signed
+        })
+      }
+
+      function getContent(wrapper, contentId) {
+        fetch(`${baseUrl}/content/${contentId}`, {
+          headers: {
+            Origin: origin
+          }
+        })
+        .then(response => response.json())
+        .then(({acceptance_text, documents, error}) => {
+          if (!documents) { throw error.message }
+
+          wrapper.innerHTML = ''
+
+          let checkbox = document.createElement('input')
+          let textWrapper = document.createElement('span')
+
+          checkbox.type = 'checkbox'
+          checkbox.id = 'cs-checkbox-sign'
+
+          textWrapper.className = 'cs-acceptance-text'
+
+          documents.forEach((document) => {
+            const regex = /\(\((.[^\)\)]*)\)\)/
+            const strMatch = acceptance_text.match(regex)
+
+            let docLink = this.document.createElement('a')
+
+            docLink.innerHTML = `${strMatch[1]}`
+            docLink.className = 'cs-acceptance-preview'
+            docLink.href = document.download_url
+            docLink.setAttribute('download', true)
+            acceptance_text = acceptance_text.replace(regex, docLink.outerHTML)
+          })
+
+          textWrapper.insertAdjacentHTML('afterbegin', acceptance_text)
+
+          wrapper.append(checkbox)
+          wrapper.append(textWrapper)
+          addCheckboxEventListener()
+        })
+      }
+    }
+
+    function setWidget(){
+      const submitButton = document.getElementById('submitButton')
+      const key = document.getElementById('key').value
+
+      const tw = new tokenlessWidget(key)
+      tw.injectLoader('<div class="loader"></div>')
+      tw.attach('click', 'submitButton', () => {
+        const data = {
+          "signature": {
+            "birthday": document.getElementById("birthdate"),
+            "documentation": document.getElementById("cpf")
+          }
+        }
+
+        tw.sign(data)
+        .then(() => {
+          submitButton.setAttribute("value", "Assinatura realizada com sucesso!");
+          submitButton.setAttribute("style", "background-color: green;");
+          console.log('Assinatura realizada com sucesso!')
+        })
+        .catch((error) => {
+          submitButton.setAttribute("value", `Erro ao assinar o documento. Confira log`);
+          submitButton.setAttribute("style", "background-color: red;");
+          console.log(error.code, error.message)
+        })
+      })
+
+      tw.mount({
+        'containerId':'cs-tokenless-widget',
+        'textTemplate': 'banco_acme_1'
+      })
+      submitButton.removeAttribute('disabled')
+    }
+  </script>
+  
+</html>
