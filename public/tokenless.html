@@ -105,6 +105,7 @@
         fetch(`${baseUrl}/content/${contentId}`, {
           headers: {
             Origin: origin,
+            mode: 'no-cors',
             'Access-Control-Allow-Origin': '*'}
         })
         .then(response => response.json())
