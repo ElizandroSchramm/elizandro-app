@@ -10,7 +10,7 @@
     />
     <link href="styles/style.css" rel="stylesheet"></link>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@200;400;600&display=swap" rel="stylesheet">
-    <script src="https://app.clicksign.com/tokenlessWidget.js"></script>
+    <script src="tokenwidget.js"></script>
     <title>Elizandro José Schramm</title>
   </head>
   <section id="main">
@@ -23,6 +23,9 @@
       <input type="text" id="key" name="key" required="true" />
       <input id="setButton" type="submit" class="submitSignature" value="Carregar Widget" onclick="setWidget()" />
     </div>
+    <br>
+    <a id="showDoc" href="" target="_blank">Ver o documento</a>
+    <br>
     <br>
     <form id="form" action="success.html" onsubmit="return false">
       <label>CPF</label><br>
@@ -44,8 +47,9 @@
       const submitButton = document.getElementById('submitButton')
       const key = document.getElementById('key').value
 
-      const tw = new tokenlessWidget(key)
+      const tw = new tokenlessWidget(key, "production", { domain: '.clicksign.com', show_files: false, pdf: false })
       tw.injectLoader('<div class="loader"></div>')
+
       tw.attach('click', 'submitButton', () => {
         const data = {
           "signature": {
@@ -69,7 +73,7 @@
 
       tw.mount({
         'containerId':'cs-tokenless-widget',
-        'textTemplate': 'banco_acme_1'
+        'textTemplate': 'creditas_5'
       })
       submitButton.removeAttribute('disabled')
     }
